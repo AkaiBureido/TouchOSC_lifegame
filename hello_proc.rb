@@ -1,6 +1,37 @@
 require 'ruby-osc'
 require 'pry'
 
+# This addition to the array stacks up an array
+# as in [1,2,3,4].stack 2 -> [[1,2],[3,4]]
+# pretty usefull I think
+
+# As long as you are dealing with 1d arrays it is ok to use default element
+# but with anything greater it is likekely not worth it...
+
+class Array
+    def stack number, default = nil
+        resultant_array = []
+
+        if number > 0
+            shifts = (self.size().to_f / number.to_f()).ceil
+
+            shifts.times { resultant_array.push shift(number) }
+
+            if (last_element_size = resultant_array[-1].size) < number
+                resultant_array[-1].concat Array.new(number - last_element_size) { default }
+            end
+        elsif number < 0
+            raise ArgumentError.new.exception "negative array size"
+        else
+            resultant_array = [[]]
+        end
+
+        return resultant_array
+    end
+end
+
+
+
 module IPAD_OSC_SCREEN
     @@messages_sent_lock = Mutex.new
     @@messages_sent = 0
@@ -178,43 +209,51 @@ class Game
     end
 
     def play!
+        OSC.run do
 
-        iPad = OSC::Client.new @port, @ip
-        IPAD_OSC_SCREEN::clearScreen iPad
+            # server = OSC::Server.new 9090, "192.168.0.197"
+
+            # server.add_pattern %r{/.*/} do |*args|       # this will match any address
+            #     args[0].scan(%r{(?<=_)\d+})
+            #     puts "/.*/:       #{ args.join(', ') }"
+            # end
+
+            iPad = OSC::Client.new @port, @ip
+            IPAD_OSC_SCREEN::clearScreen iPad
 
 
-        currThread = nil
-        screen_history = nil
-        time = nil
+            currThread = nil
+            screen_history = nil
+            time = nil
 
-        (1..@steps).each do |index|
-            next!
+            (1..@steps).each do |index|
+                next!
 
-            # AND THIS WOULD BE MY SMALL ADDITION
-            # so that instead of printing to console it prints to iPad.
+                # AND THIS WOULD BE MY SMALL ADDITION
+                # so that instead of printing to console it prints to iPad.
 
-            windows = IPAD_OSC_SCREEN::splitIntoSubscreens @cells, 16, 16
+                windows = IPAD_OSC_SCREEN::splitIntoSubscreens @cells, 16, 16
 
-            if currThread then currThread.join end
-            screen_history_copy = Marshal.load( Marshal.dump(screen_history) )
-            currThread = Thread.new {
-                iPad = OSC::Client.new @port, @ip
-                IPAD_OSC_SCREEN::updateFullScreen(iPad, 3, 2, windows, screen_history_copy)
-            }
+                if currThread then currThread.join end
+                screen_history_copy = Marshal.load( Marshal.dump(screen_history) )
+                currThread = Thread.new {
+                    iPad = OSC::Client.new @port, @ip
+                    IPAD_OSC_SCREEN::updateFullScreen(iPad, 3, 4, windows, screen_history_copy)
+                }
 
-            screen_history = Marshal.load( Marshal.dump(windows) )
-            sleep 0.1
+                screen_history = Marshal.load( Marshal.dump(windows) )
+                sleep 0.1
 
-            if time.nil?
-                time = Time.now
-            else
-                if Time.now > time+3
+                if time.nil?
                     time = Time.now
-                    puts "Messages Sent: #{IPAD_OSC_SCREEN::messages_sent}"
+                else
+                    if Time.now > time+3
+                        time = Time.now
+                        puts "Messages Sent: #{IPAD_OSC_SCREEN::messages_sent} Current Step: #{index}"
+                    end
                 end
             end
-
-            ###########################################################
+            ##########################################################
         end
     end
 
@@ -245,12 +284,11 @@ class Game
 end
 
 begin
-    Game.new(9000, "192.168.0.192", 16*2, 16*3, 0.6, 1000).play!
+    Game.new(9000, "192.168.0.192", 16*4, 16*3, 0.6, 1000).play!
 rescue SystemExit, Interrupt
     puts "\n\nBye!\n"
     exit
 end
-
 
 
 
