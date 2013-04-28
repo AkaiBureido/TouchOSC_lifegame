@@ -6,7 +6,7 @@ require 'pry'
 # pretty usefull I think
 
 # As long as you are dealing with 1d arrays it is ok to use default element
-# but with anything greater it is likekely not worth it...
+# but with anything greater it is not worth the hassle. Nils ftw!
 
 class Array
     def stack number, default = nil
