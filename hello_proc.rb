@@ -27,20 +27,15 @@ module IPAD_OSC_SCREEN
             total_columns.times do |column|
 
                 #TODO OPTIMIZE!
-
                 if screen_history
 
                     if screen_history[row][column] != sub_screen_array[row][column]
                         updateScreeenPortionFor(device, row, column, sub_screen_array[row][column], screen_history[row][column])
                     else
                     end
-
                 else
-
                     updateScreeenPortionFor(device, row, column, sub_screen_array[row][column], nil)
-
                 end
-
                 ###############
 
             end
@@ -61,7 +56,6 @@ module IPAD_OSC_SCREEN
             16.times do |column|
 
                 #TODO OPTIMIZE!
-
                 if screen_history
                     if screen_history[row][column].to_i != screen_array[row][column].to_i
                         value = screen_array[row][column]
@@ -71,7 +65,6 @@ module IPAD_OSC_SCREEN
                     value = screen_array[row][column]
                     messages.push OSC::Message.new("/1/screen_#{screen_row}_#{screen_column}/#{row+1}/#{column+1}", value.to_i);
                 end
-
                 ###############
 
             end
@@ -204,7 +197,6 @@ class Game
                     puts "Messages Sent: #{IPAD_OSC_SCREEN::messages_sent}"
                 end
             end
-
 
             ###########################################################
         end
