@@ -170,15 +170,16 @@ class Cell
 end
 
 class Game
-    def initialize(width, height, seed_probability, steps)
+    def initialize(port, ip, width, height, seed_probability, steps)
         @width, @height, @steps = width, height, steps
+        @port, @ip = port, ip
         @cells = Array.new(height) {
             Array.new(width) { Cell.new(seed_probability) } }
     end
 
     def play!
 
-        iPad = OSC::Client.new 9000, "192.168.0.192"
+        iPad = OSC::Client.new @port, @ip
         IPAD_OSC_SCREEN::clearScreen iPad
 
 
@@ -197,7 +198,7 @@ class Game
             if currThread then currThread.join end
             screen_history_copy = Marshal.load( Marshal.dump(screen_history) )
             currThread = Thread.new {
-                iPad = OSC::Client.new 9000, "192.168.0.192"
+                iPad = OSC::Client.new @port, @ip
                 IPAD_OSC_SCREEN::updateFullScreen(iPad, 3, 2, windows, screen_history_copy)
             }
 
@@ -244,7 +245,7 @@ class Game
 end
 
 begin
-    Game.new(16*2, 16*3, 0.6, 1000).play!
+    Game.new(9000, "192.168.0.192", 16*2, 16*3, 0.6, 1000).play!
 rescue SystemExit, Interrupt
     puts "\n\nBye!\n"
     exit
