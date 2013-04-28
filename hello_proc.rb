@@ -21,7 +21,7 @@ module IPAD_OSC_SCREEN
         updateFullScreen device, 3, 4, clearScreen, nil
     end
 
-    #this function updates the full screen on the iPad Touch OSC
+    # This function updates the full screen on the iPad Touch OSC
     def self.updateFullScreen device, total_rows, total_columns, sub_screen_array, screen_history
         total_rows.times do |row|
             total_columns.times do |column|
@@ -43,9 +43,9 @@ module IPAD_OSC_SCREEN
         end
     end
 
-    # This function updates a cell on iPad touch osc the biggest cell can get is 16
-    # the naming convention for multietoggles in Touch OSC is "screen_(ROW_NUM)_(COL_NUM)"
-    # Screen history is used to optimise requests. That is not updating the things that did not change.
+    # This function updates a cell on iPad touch osc. The biggest cell can get is 16
+    # My naming convention for multietoggles in Touch OSC is "screen_(ROW_NUM)_(COL_NUM)"
+    # Screen history is used to optimise requests. That is -- not updating the things that did not change.
     def self.updateScreeenPortionFor device, screen_row, screen_column, screen_array, screen_history
 
         # creating buffer for messages so that i am updating the whole cell at a time
@@ -117,8 +117,11 @@ module IPAD_OSC_SCREEN
         return screens
     end
 
-    # Sor of a neat function that can be used to peek into 2D array at any point even out of bounds
+    # Sort of a neat function that can be used to peek into 2D array at any point even out of bounds
     # However the default value is zero NOT nil
+    #
+    # It certainly can be neater...
+
     def self.offsetViewInto2DArray source_array, offset_row, offset_column, row_view_span, column_viewspan
         sub_screen = Array.new(row_view_span) do |row|
             Array.new(column_viewspan) do |column|
